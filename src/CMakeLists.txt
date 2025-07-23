@@ -27,25 +27,27 @@ add_subdirectory(tests)
 
 # rpmalloc
 
-project(rpmalloc C)
+if (WITH_RPMALLOC) 
+    project(rpmalloc C)
 
-add_library(rpmalloc STATIC)
-set(RPMALLOC_HOME "${CMAKE_CURRENT_SOURCE_DIR}/external/rpmalloc/rpmalloc")
-target_include_directories(rpmalloc SYSTEM INTERFACE ${RPMALLOC_HOME})
-target_sources(rpmalloc PRIVATE
-    ${RPMALLOC_HOME}/rpmalloc.c
-    ${RPMALLOC_HOME}/rpmalloc.h
-    # Do not use! Overriding operator new/delete is too bug-prone.
-    #${RPMALLOC_HOME}/rpnew.h
-)
-set_target_properties(rpmalloc PROPERTIES C_STANDARD 11)
-set_target_properties(rpmalloc PROPERTIES LINKER_LANGUAGE C)
-# ENABLE_OVERRIDE=1 results in a segfault from _dl_start_user
-target_compile_definitions(rpmalloc PUBLIC ENABLE_OVERRIDE=0 ENABLE_ASSERTS=0)
+    add_library(rpmalloc STATIC)
+    set(RPMALLOC_HOME "${CMAKE_CURRENT_SOURCE_DIR}/external/rpmalloc/rpmalloc")
+    target_include_directories(rpmalloc SYSTEM INTERFACE ${RPMALLOC_HOME})
+    target_sources(rpmalloc PRIVATE
+        ${RPMALLOC_HOME}/rpmalloc.c
+        ${RPMALLOC_HOME}/rpmalloc.h
+        # Do not use! Overriding operator new/delete is too bug-prone.
+        #${RPMALLOC_HOME}/rpnew.h
+    )
+    set_target_properties(rpmalloc PROPERTIES C_STANDARD 11)
+    set_target_properties(rpmalloc PROPERTIES LINKER_LANGUAGE C)
+    # ENABLE_OVERRIDE=1 results in a segfault from _dl_start_user
+    target_compile_definitions(rpmalloc PUBLIC ENABLE_OVERRIDE=0 ENABLE_ASSERTS=0)
 
-option(ENABLE_RPMALLOC_STATISTICS "Enables statistics for rpmalloc" OFF)
-if (ENABLE_RPMALLOC_STATISTICS)
-	target_compile_definitions(rpmalloc PRIVATE -DENABLE_STATISTICS=1)
+    option(ENABLE_RPMALLOC_STATISTICS "Enables statistics for rpmalloc" OFF)
+    if (ENABLE_RPMALLOC_STATISTICS)
+        target_compile_definitions(rpmalloc PRIVATE -DENABLE_STATISTICS=1)
+    endif()
 endif()
 
 #add_subdirectory(external/zlib)
